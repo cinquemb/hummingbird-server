@@ -1139,6 +1139,7 @@ ActiveRecord::Schema.define(version: 20170327054025) do
     t.boolean  "profile_completed",                       default: false,       null: false
     t.boolean  "feed_completed",                          default: false,       null: false
     t.boolean  "cover_image_processing"
+    t.datetime "deleted_at"
   end
 
   add_index "users", ["email"], name: "index_users_on_email", unique: true, using: :btree
