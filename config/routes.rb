@@ -80,6 +80,9 @@ Rails.application.routes.draw do
       post '/feeds/:group/:id/_seen', to: 'feeds#mark_seen'
       delete '/feeds/:group/:id/activities/:uuid', to: 'feeds#destroy_activity'
 
+      ### Site Metadata
+      jsonapi_resource :site
+
       ### Groups
       jsonapi_resources :groups
       jsonapi_resources :group_members
