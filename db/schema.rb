@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170411042333) do
+ActiveRecord::Schema.define(version: 20170420035108) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -606,10 +606,17 @@ ActiveRecord::Schema.define(version: 20170411042333) do
     t.text     "error_message"
     t.datetime "created_at",                           null: false
     t.datetime "updated_at",                           null: false
-    t.integer  "day"
   end
 
   add_index "library_entry_logs", ["linked_account_id"], name: "index_library_entry_logs_on_linked_account_id", using: :btree
+
+  create_table "library_events", force: :cascade do |t|
+    t.integer  "library_entry_id", null: false
+    t.integer  "event",            null: false
+    t.integer  "status"
+    t.datetime "created_at",       null: false
+    t.datetime "updated_at",       null: false
+  end
 
   create_table "linked_accounts", force: :cascade do |t|
     t.integer  "user_id",                            null: false
@@ -707,25 +714,6 @@ ActiveRecord::Schema.define(version: 20170411042333) do
   end
 
   add_index "mappings", ["external_site", "external_id", "media_type", "media_id"], name: "index_mappings_on_external_and_media", unique: true, using: :btree
-
-  create_table "marathon_events", force: :cascade do |t|
-    t.integer  "marathon_id", null: false
-    t.integer  "unit_id"
-    t.string   "unit_type"
-    t.integer  "event",       null: false
-    t.integer  "status"
-    t.datetime "created_at",  null: false
-    t.datetime "updated_at",  null: false
-  end
-
-  create_table "marathons", force: :cascade do |t|
-    t.integer  "library_entry_id", null: false
-    t.boolean  "rewatch",          null: false
-    t.datetime "started_at"
-    t.datetime "ended_at"
-    t.datetime "created_at",       null: false
-    t.datetime "updated_at",       null: false
-  end
 
   create_table "media_follows", force: :cascade do |t|
     t.integer  "user_id",    null: false
@@ -1251,13 +1239,12 @@ ActiveRecord::Schema.define(version: 20170411042333) do
   add_foreign_key "groups", "group_categories", column: "category_id"
   add_foreign_key "leader_chat_messages", "groups"
   add_foreign_key "leader_chat_messages", "users"
+  add_foreign_key "library_events", "library_entries"
   add_foreign_key "linked_accounts", "users"
   add_foreign_key "manga_characters", "characters"
   add_foreign_key "manga_characters", "manga"
   add_foreign_key "manga_staff", "manga"
   add_foreign_key "manga_staff", "people"
-  add_foreign_key "marathon_events", "marathons"
-  add_foreign_key "marathons", "library_entries"
   add_foreign_key "media_follows", "users"
   add_foreign_key "posts", "users"
   add_foreign_key "posts", "users", column: "target_user_id"
