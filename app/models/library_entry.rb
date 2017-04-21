@@ -203,6 +203,8 @@ class LibraryEntry < ApplicationRecord
   end
 
   after_create do
+    # Activity History Stat will be using this
+    LibraryEvent.create_for(:added, self)
     # Stat STI
     case kind
     when :anime
@@ -212,6 +214,11 @@ class LibraryEntry < ApplicationRecord
       Stat::MangaGenreBreakdown.increment(user, self)
       Stat::MangaAmountConsumed.increment(user, self)
     end
+  end
+
+  after_update do
+    # Activity History Stat will be using this
+    LibraryEvent.create_for(:updated, self)
   end
 
   after_destroy do
