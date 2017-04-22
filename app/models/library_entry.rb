@@ -204,21 +204,30 @@ class LibraryEntry < ApplicationRecord
 
   after_create do
     # Activity History Stat will be using this
-    LibraryEvent.create_for(:added, self)
+    library_event = LibraryEvent.create_for(:added, self)
     # Stat STI
     case kind
     when :anime
       Stat::AnimeGenreBreakdown.increment(user, self)
       Stat::AnimeAmountConsumed.increment(user, self)
+      Stat::AnimeActivityHistory.increment(user, library_event)
     when :manga
       Stat::MangaGenreBreakdown.increment(user, self)
       Stat::MangaAmountConsumed.increment(user, self)
+      Stat::MangaActivityHistory.increment(user, library_event)
     end
   end
 
   after_update do
     # Activity History Stat will be using this
-    LibraryEvent.create_for(:updated, self)
+    # TODO: refactor this somehow?
+    library_event = LibraryEvent.create_for(:updated, self)
+    case kind
+    when :anime
+      Stat::AnimeActivityHistory.increment(user, library_event)
+    when :manga
+      Stat::MangaActivityHistory.increment(user, library_event)
+    end
   end
 
   after_destroy do
@@ -228,9 +237,11 @@ class LibraryEntry < ApplicationRecord
     when :anime
       Stat::AnimeGenreBreakdown.decrement(user, self)
       Stat::AnimeAmountConsumed.decrement(user, self)
+      Stat::AnimeActivityHistory.decrement(user, self)
     when :manga
       Stat::MangaGenreBreakdown.decrement(user, self)
       Stat::MangaAmountConsumed.decrement(user, self)
+      Stat::MangaActivityHistory.decrement(user, self)
     end
   end
 
